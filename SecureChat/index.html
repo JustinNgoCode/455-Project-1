@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureChat</title>
+</head>
+<body>
+    <h1>SecureChat</h1>
+    <form id="authForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Connect</button>
+    </form>
+    <div id="chat">
+        <ul id="messages"></ul>
+        <form id="messageForm" style="display:none;">
+            <input type="text" id="messageInput" autocomplete="off">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const authForm = document.getElementById('authForm');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const messages = document.getElementById('messages');
+
+        let ws;
+
+        authForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Include username and password in the WebSocket URL
+            ws = new WebSocket(`ws://localhost:3000?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+
+            ws.onopen = () => {
+                authForm.style.display = 'none';
+                messageForm.style.display = 'block';
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data); // Parse the JSON string
+                const li = document.createElement('li');
+
+                // Check if the message has a user or is a system message
+                if (data.user) {
+                    li.textContent = `${data.user}: ${data.message}`; // Display user and message
+                } else {
+                    li.textContent = data.message; // Display system message 
+                }
+
+                messages.appendChild(li);
+            };
+
+            ws.onclose = () => {
+                alert('Connection closed');
+                authForm.style.display = 'block';
+                messageForm.style.display = 'none';
+            };
+        });
+
+        messageForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const message = messageInput.value;
+            const data = JSON.stringify({ message: message }); // Wrap the message in a JSON object
+            ws.send(data);
+            messageInput.value = '';
+        });
+    </script>
+</body>
+</html>

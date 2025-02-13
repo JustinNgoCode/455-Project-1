@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SecureChat</title>
+</head>
+<body>
+    <h2>SecureChat</h2>
+    <input type="text" id="message" placeholder="Type a message">
+    <button onclick="sendMessage()">Send</button>
+    <ul id="messages"></ul>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:3000");
+
+        ws.onmessage = (event) => {
+            const li = document.createElement("li");
+            li.textContent = event.data;
+            document.getElementById("messages").appendChild(li);
+        };
+
+        function sendMessage() {
+            const msg = document.getElementById("message").value;
+            ws.send(msg);
+        }
+    </script>
+</body>
+</html>

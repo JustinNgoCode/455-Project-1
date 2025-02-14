@@ -95,6 +95,7 @@ A basic HTML/JavaScript interface connecting to the WebSocket server.
 - **Improved UI** – Add styling, timestamps, and user avatars.
 - **End-to-End Encryption** – Secure chat messages.
 - **User Registration** – Allow users to sign up instead of using predefined logins.
+- **File Transfer** - Functionality to transfer files (documents, images, etc.
 
 
 

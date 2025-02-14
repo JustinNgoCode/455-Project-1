@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Tell the browser how to read the text -->
     <meta charset="UTF-8">
+    <!-- Make the page look good on all devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title of the page -->
     <title>SecureChat</title>
 </head>
 <body>
+    <!-- Main heading for the chat app -->
     <h1>SecureChat</h1>
+
+    <!-- Form for logging in -->
     <form id="authForm">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -14,8 +20,12 @@
         <input type="password" id="password" name="password" required>
         <button type="submit">Connect</button>
     </form>
+
+    <!-- Chat section -->
     <div id="chat">
+        <!-- List to show all messages -->
         <ul id="messages"></ul>
+        <!-- Form for sending messages (hidden at first) -->
         <form id="messageForm" style="display:none;">
             <input type="text" id="messageInput" autocomplete="off">
             <button type="submit">Send</button>
@@ -23,53 +33,59 @@
     </div>
 
     <script>
+        // Get references to the HTML elements
         const authForm = document.getElementById('authForm');
         const messageForm = document.getElementById('messageForm');
         const messageInput = document.getElementById('messageInput');
         const messages = document.getElementById('messages');
 
-        let ws;
+        let ws; // WebSocket connection
 
+        // When the login form is submitted
         authForm.addEventListener('submit', (event) => {
-            event.preventDefault();
+            event.preventDefault(); // Stop the form from refreshing the page
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // Include username and password in the WebSocket URL
+            // Connect to the WebSocket server with username and password
             ws = new WebSocket(`ws://localhost:3000?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
 
+            // When the WebSocket connection opens
             ws.onopen = () => {
-                authForm.style.display = 'none';
-                messageForm.style.display = 'block';
+                authForm.style.display = 'none'; // Hide the login form
+                messageForm.style.display = 'block'; // Show the message form
             };
 
+            // When a message is received from the server
             ws.onmessage = (event) => {
-                const data = JSON.parse(event.data); // Parse the JSON string
-                const li = document.createElement('li');
+                const data = JSON.parse(event.data); // Convert the message from JSON
+                const li = document.createElement('li'); // Create a new list item
 
-                // Check if the message has a user or is a system message
+                // If the message has a user, it's a chat message
                 if (data.user) {
-                    li.textContent = `${data.user}: ${data.message}`; // Display user and message
+                    li.textContent = `${data.user}: ${data.message}`; // Show username and message
                 } else {
-                    li.textContent = data.message; // Display system message 
+                    li.textContent = data.message; // Show system messages
                 }
 
-                messages.appendChild(li);
+                messages.appendChild(li); // Add the message to the list
             };
 
+            // When the WebSocket connection closes
             ws.onclose = () => {
-                alert('Connection closed');
-                authForm.style.display = 'block';
-                messageForm.style.display = 'none';
+                alert('Connection closed'); // Notify the user
+                authForm.style.display = 'block'; // Show the login form again
+                messageForm.style.display = 'none'; // Hide the message form
             };
         });
 
+        // When the message form is submitted
         messageForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const message = messageInput.value;
-            const data = JSON.stringify({ message: message }); // Wrap the message in a JSON object
-            ws.send(data);
-            messageInput.value = '';
+            event.preventDefault(); // Stop the form from refreshing the page
+            const message = messageInput.value; // Get the message from the input
+            const data = JSON.stringify({ message: message }); // Convert it to JSON
+            ws.send(data); // Send the message to the server
+            messageInput.value = ''; // Clear the input box
         });
     </script>
 </body>

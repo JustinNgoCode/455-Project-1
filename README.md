@@ -1,6 +1,6 @@
 ## SecureChat
 
-SecureChat is a lightweight real-time chat application that utilizes **WebSocket** for instant communication and **Express** for serving static files. It includes authentication, rate limiting, and a simple front-end for chatting.
+SecureChat is a lightweight real-time chat application that utilizes WebSocket for instant communication and Express for serving static files. It includes authentication, rate limiting, and a simple front-end for chatting.
 
 ### Features:
 

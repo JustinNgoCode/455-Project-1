@@ -46,9 +46,11 @@ const SECRET_KEY = process.env.SECRET_KEY || 'secretkey';
 function logMessage(sessionId, sender, recipient, message) {
     const logDir = path.join(__dirname, 'logs');
     if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
-    const chatPair = [sender, recipient].sort().join('-'); // Sort to ensure consistent filenames
+    const chatPair = [sender, recipient].sort().join('-');
     const logFile = path.join(logDir, `${sessionId}_${chatPair}.txt`);
-    fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${sender} to ${recipient}: ${message}\n`);
+    // Convert the message to a string if it's an object
+    const messageString = typeof message === 'object' ? JSON.stringify(message) : message;
+    fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${sender} to ${recipient}: ${messageString}\n`);
 }
 
 function saveUsers() {

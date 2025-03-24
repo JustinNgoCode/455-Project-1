@@ -35,24 +35,20 @@ if (fs.existsSync(usersFile)) {
 }
 
 const loginAttempts = {};
-const connectedUsers = new Map();
-const publicKeys = new Map();
+const connectedUsers = new Map(); // Map username to WebSocket client
+const publicKeys = new Map(); // Map username to public key
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_TIME = 15 * 60 * 1000;
-const MAX_MESSAGES_PER_MINUTE = 10;
+const MAX_MESSAGES_PER_MINUTE = 5;
 const RATE_LIMIT_TIME = 60000;
 const SECRET_KEY = process.env.SECRET_KEY || 'secretkey';
-
-const HOST = process.env.HOST || '0.0.0.0';
-const PORT = process.env.PORT || 3000;
 
 function logMessage(sessionId, sender, recipient, message) {
     const logDir = path.join(__dirname, 'logs');
     if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
-    const chatPair = [sender, recipient].sort().join('-');
+    const chatPair = [sender, recipient].sort().join('-'); // Sort to ensure consistent filenames
     const logFile = path.join(logDir, `${sessionId}_${chatPair}.txt`);
-    const messageString = typeof message === 'object' ? JSON.stringify(message) : message;
-    fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${sender} to ${recipient}: ${messageString}\n`);
+    fs.appendFileSync(logFile, `[${new Date().toISOString()}] ${sender} to ${recipient}: ${message}\n`);
 }
 
 function saveUsers() {
@@ -118,6 +114,7 @@ wss.on('connection', (ws, req) => {
             if (data.type === 'publicKey') {
                 publicKeys.set(username, data.publicKey);
                 console.log(`Received public key from ${username}`);
+                // Broadcast public keys to all users
                 wss.clients.forEach((client) => {
                     if (client.readyState === WebSocket.OPEN) {
                         client.send(JSON.stringify({ type: 'publicKeys', publicKeys: Object.fromEntries(publicKeys) }));
@@ -160,10 +157,6 @@ wss.on('connection', (ws, req) => {
     });
 });
 
-app.get('/ping', (req, res) => {
-    res.status(200).json({ message: 'Server is running' });
-});
-
 app.post('/register', (req, res) => {
     console.log('Received /register request:', req.body);
     const { username, password } = req.body;
@@ -197,4 +190,4 @@ app.post('/login', (req, res) => {
     res.json({ token });
 });
 
-server.listen(PORT, HOST, () => console.log(`Server running on http://${HOST}:${PORT}`));
+server.listen(3000, () => console.log('Server running on http://localhost:3000'));

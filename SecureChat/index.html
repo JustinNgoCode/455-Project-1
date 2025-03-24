@@ -113,6 +113,15 @@
     <div id="auth">
         <h2>SecureChat</h2>
         <div>
+            <label for="server-url">Server URL (e.g., ws://localhost:3000):</label>
+            <input type="text" id="server-url" value="ws://localhost:3000" placeholder="ws://hostname:port">
+            <button onclick="testConnection()">Test Connection</button>
+            <small style="color: #555; display: block;">
+                To connect over a local network, run the server on one device and enter its IP address (e.g., ws://192.168.1.100:3000).
+                On the server device, use `ipconfig` (Windows) or `ifconfig` (Linux/Mac) to find its IP address.
+            </small>
+        </div>
+        <div>
             <h3>Register</h3>
             <input type="text" id="reg-username" placeholder="Username">
             <input type="password" id="reg-password" placeholder="Password">
@@ -169,6 +178,44 @@
         let activeChat = null;
         const chatHistories = new Map();
 
+        function getServerUrl() {
+            const serverUrl = document.getElementById('server-url').value.trim();
+            if (!serverUrl.match(/^(ws|wss):\/\/[^ "]+$/)) {
+                throw new Error('Invalid server URL. It must start with ws:// or wss://');
+            }
+            return serverUrl;
+        }
+
+        function getHttpUrl(wsUrl) {
+            try {
+                const url = new URL(wsUrl);
+                const protocol = url.protocol === 'wss:' ? 'https:' : 'http:';
+                return `${protocol}//${url.host}${url.pathname}`;
+            } catch (err) {
+                throw new Error('Invalid WebSocket URL for HTTP conversion: ' + err.message);
+            }
+        }
+
+        async function testConnection() {
+            const errorElement = document.getElementById('auth-error');
+            try {
+                const serverUrl = getServerUrl();
+                const httpUrl = getHttpUrl(serverUrl);
+                const response = await fetch(`${httpUrl}/ping`, { method: 'GET' });
+                if (response.ok) {
+                    errorElement.textContent = 'Server connection successful!';
+                    errorElement.style.color = 'green';
+                } else {
+                    errorElement.textContent = 'Failed to connect to the server.';
+                    errorElement.style.color = 'red';
+                }
+            } catch (err) {
+                console.error('Test connection error:', err);
+                errorElement.textContent = 'Error connecting to server: ' + err.message;
+                errorElement.style.color = 'red';
+            }
+        }
+
         async function generateKeyPair() {
             const keyPair = await window.crypto.subtle.generateKey(
                 {
@@ -209,16 +256,20 @@
             const errorElement = document.getElementById('auth-error');
 
             try {
-                const response = await fetch('http://localhost:3000/register', {
+                const serverUrl = getServerUrl();
+                const httpUrl = getHttpUrl(serverUrl);
+                const response = await fetch(`${httpUrl}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
                 const data = await response.json();
                 errorElement.textContent = response.ok ? 'Registration successful! Please log in.' : (data.error || 'Registration failed.');
+                errorElement.style.color = response.ok ? 'green' : 'red';
             } catch (err) {
                 console.error('Register error:', err);
-                errorElement.textContent = 'Error connecting to server.';
+                errorElement.textContent = 'Error connecting to server: ' + err.message;
+                errorElement.style.color = 'red';
             }
         }
 
@@ -228,7 +279,9 @@
             const errorElement = document.getElementById('auth-error');
 
             try {
-                const response = await fetch('http://localhost:3000/login', {
+                const serverUrl = getServerUrl();
+                const httpUrl = getHttpUrl(serverUrl);
+                const response = await fetch(`${httpUrl}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
@@ -240,16 +293,19 @@
                     connectWebSocket(token, userPublicKey);
                 } else {
                     errorElement.textContent = data.error || 'Login failed.';
+                    errorElement.style.color = 'red';
                 }
             } catch (err) {
                 console.error('Login error:', err);
-                errorElement.textContent = 'Error connecting to server.';
+                errorElement.textContent = 'Error connecting to server: ' + err.message;
+                errorElement.style.color = 'red';
             }
         }
 
         function connectWebSocket(token, userPublicKey) {
             console.log('Connecting to WebSocket with token:', token);
-            ws = new WebSocket(`ws://localhost:3000?token=${token}`);
+            const serverUrl = getServerUrl();
+            ws = new WebSocket(`${serverUrl}?token=${token}`);
 
             ws.onopen = () => {
                 console.log('Connected to WebSocket server');
@@ -271,7 +327,6 @@
                         console.log('Received public keys:', publicKeys);
                     } else if (data.user) {
                         if (data.type === 'file') {
-                            // Decrypt the file and create a download link
                             const decryptedFileData = await decryptFile(data.data, data.key, data.iv);
                             const blob = new Blob([decryptedFileData], { type: 'application/octet-stream' });
                             const url = URL.createObjectURL(blob);
@@ -295,6 +350,7 @@
                 document.getElementById('chat').style.display = 'none';
                 document.getElementById('users-container').style.display = 'none';
                 document.getElementById('auth-error').textContent = 'Disconnected: ' + event.reason;
+                document.getElementById('auth-error').style.color = 'red';
 
                 if (reconnectAttempts < maxReconnectAttempts) {
                     console.log(`Attempting to reconnect (${reconnectAttempts + 1}/${maxReconnectAttempts})...`);
@@ -305,6 +361,7 @@
                 } else {
                     console.error('Max reconnect attempts reached. Please log in again.');
                     document.getElementById('auth-error').textContent = 'Connection lost. Please log in again.';
+                    document.getElementById('auth-error').style.color = 'red';
                 }
             };
 
@@ -319,6 +376,7 @@
             document.getElementById('chat').style.display = 'none';
             document.getElementById('users-container').style.display = 'none';
             document.getElementById('auth-error').textContent = 'Logged out successfully.';
+            document.getElementById('auth-error').style.color = 'green';
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
             activeChat = null;
@@ -558,14 +616,12 @@
             const encryptedSymmetricKey = new Uint8Array(atob(encryptedKey).split('').map(c => c.charCodeAt(0)));
             const ivArray = new Uint8Array(atob(iv).split('').map(c => c.charCodeAt(0)));
 
-            // Decrypt the symmetric key with the user's private key
             const symmetricKey = await crypto.subtle.decrypt(
                 { name: 'RSA-OAEP' },
                 privateKey,
                 encryptedSymmetricKey
             );
 
-            // Import the symmetric key for AES-CBC decryption
             const importedSymmetricKey = await crypto.subtle.importKey(
                 'raw',
                 symmetricKey,
@@ -574,7 +630,6 @@
                 ['decrypt']
             );
 
-            // Decrypt the file data
             const decrypted = await crypto.subtle.decrypt(
                 { name: 'AES-CBC', iv: ivArray },
                 importedSymmetricKey,
@@ -614,5 +669,6 @@
             if (event.key === 'Enter') sendMessage();
         });
     </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92540e68c9a353c4',t:'MTc0Mjc5NzE1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

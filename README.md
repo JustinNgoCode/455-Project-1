@@ -5,7 +5,7 @@ SecureChat is a real-time chat application built with WebSocket for instant comm
 ### Features:
 
 - User Authentication - Register and log in with a username and password.
-- Rate Limiting - Users can send up to 5 messages per minute.
+- Rate Limiting - Users can send up to 10 messages per minute.
 - Live Private Chat - Messages are sent in real time to specific users.
 - End-to-End Encryption - Messages and files are encrypted using AES-256 and RSA-4096.
 - File Sharing - Securely send files to other users.

@@ -271,7 +271,12 @@
                         console.log('Received public keys:', publicKeys);
                     } else if (data.user) {
                         if (data.type === 'file') {
-                            appendMessage(`${data.user} sent a file: ${data.filename}`, data.user);
+                            // Decrypt the file and create a download link
+                            const decryptedFileData = await decryptFile(data.data, data.key, data.iv);
+                            const blob = new Blob([decryptedFileData], { type: 'application/octet-stream' });
+                            const url = URL.createObjectURL(blob);
+                            const message = `${data.user} sent a file: <a href="${url}" download="${data.filename}">${data.filename}</a>`;
+                            appendMessage(message, data.user);
                         } else {
                             const decryptedMessage = await decryptMessage(data.message);
                             appendMessage(`${data.user}: ${decryptedMessage}`, data.user);
@@ -546,6 +551,37 @@
                 data
             );
             return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+        }
+
+        async function decryptFile(fileData, encryptedKey, iv) {
+            const encryptedFileData = new Uint8Array(atob(fileData).split('').map(c => c.charCodeAt(0)));
+            const encryptedSymmetricKey = new Uint8Array(atob(encryptedKey).split('').map(c => c.charCodeAt(0)));
+            const ivArray = new Uint8Array(atob(iv).split('').map(c => c.charCodeAt(0)));
+
+            // Decrypt the symmetric key with the user's private key
+            const symmetricKey = await crypto.subtle.decrypt(
+                { name: 'RSA-OAEP' },
+                privateKey,
+                encryptedSymmetricKey
+            );
+
+            // Import the symmetric key for AES-CBC decryption
+            const importedSymmetricKey = await crypto.subtle.importKey(
+                'raw',
+                symmetricKey,
+                { name: 'AES-CBC' },
+                false,
+                ['decrypt']
+            );
+
+            // Decrypt the file data
+            const decrypted = await crypto.subtle.decrypt(
+                { name: 'AES-CBC', iv: ivArray },
+                importedSymmetricKey,
+                encryptedFileData
+            );
+
+            return new TextDecoder().decode(decrypted);
         }
 
         function toggleEmojiPicker() {

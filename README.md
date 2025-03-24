@@ -9,8 +9,14 @@ SecureChat is a real-time chat application built with WebSocket for instant comm
 - Live Private Chat - Messages are sent in real time to specific users.
 - End-to-End Encryption - Messages and files are encrypted using AES-256 and RSA-4096.
 - File Sharing - Securely send files to other users.
+- File Download Support (Download decrypted files)
 - User-Friendly UI - Styled interface with emoji support and text formatting.
+- Local Echo of Messages (Sender’s messages shown locally)
 - Reconnect Logic - Automatically attempts to reconnect on connection loss (up to 5 attempts).
+- Text Formatting Support (Bold, italic, links)
+- Brute Force Protection for Login (Limits failed login attempts)
+- Cross-Platform Electron App (Works on multiple OSes)
+
 
 ### Project Structure:
 

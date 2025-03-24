@@ -39,7 +39,7 @@ const connectedUsers = new Map(); // Map username to WebSocket client
 const publicKeys = new Map(); // Map username to public key
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_TIME = 15 * 60 * 1000;
-const MAX_MESSAGES_PER_MINUTE = 5;
+const MAX_MESSAGES_PER_MINUTE = 10;
 const RATE_LIMIT_TIME = 60000;
 const SECRET_KEY = process.env.SECRET_KEY || 'secretkey';
 

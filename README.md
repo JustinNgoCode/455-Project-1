@@ -17,7 +17,6 @@ SecureChat is a real-time chat application built with WebSocket for instant comm
 - **Brute Force Protection for Login** - Limits failed login attempts to 5, with a 15-minute lockout period.
 - **Cross-Platform Electron App** - Works on Windows, macOS, and Linux (tested on Windows).
 - **Encrypted Chat Logging System** - Logs encrypted chat sessions to the `logs/` directory for debugging.
-- **Network Support** - Now supports LAN communication, allowing users on different devices in the same network to chat; prepared for future Internet communication.
 
 ### Project Structure:
 

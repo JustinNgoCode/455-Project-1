@@ -16,7 +16,7 @@ FriendChat is a secure chat application built with PHP and MySQL for the backend
 - **Cross-Origin Support** - Supports CORS for flexible frontend hosting.
 - **Encrypted Chat Logging System** - Logs encrypted chat sessions to the logs directory for debugging.
 - **Local Echo of Messages** - Sender’s messages are shown locally in the chat window.
-- **Text Formatting Support** - Supports bold (**text**), italic (*text*), and links ([text](url)).
+- **Text Formatting Support** - Supports bold (**text**), italic (*text*), and links.
 
 ### Project Structure:
 
@@ -50,7 +50,7 @@ A single-page HTML/JavaScript interface that communicates with the backend via H
 
 #### Requirements:
 1. A web server with PHP (version 7.4 or higher) and MySQL support (e.g., InfinityFree hosting).
-2. A reCAPTCHA v2 key pair from [Google reCAPTCHA](https://www.google.com/recaptcha).
+2. A reCAPTCHA v2 key pair from Google reCAPTCHA
 3. A MySQL database with the following tables:
    - users (for storing user credentials)
    - messages (for storing chat messages and files)
@@ -99,13 +99,13 @@ A single-page HTML/JavaScript interface that communicates with the backend via H
 
 #### Frontend Setup:
 - Save the frontend code as index.html
-- Update the BASE_URL constant in index.html to match your server's domain (e.g., https://yourdomain.com).
+- Update the BASE_URL constant in index.html to match your server's domain
 - Replace the reCAPTCHA site key in index.html (6LejTjYrAAAAAILxCq5QrZZ_fBN5hPfbo_zxRR09) with your reCAPTCHA site key.
 - Upload index.html to your web server or host it separately.
 
 #### Running the Application:
 - Ensure your web server is running with PHP and MySQL configured.
-- Access index.html through a browser (e.g., https://yourdomain.com/index.html).
+- Access index.html through a browser 
 - Register a new user or log in with an existing account.
 - Start chatting and sharing files securely.
 

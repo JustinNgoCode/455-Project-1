@@ -89,30 +89,30 @@ A single-page HTML/JavaScript interface that communicates with the backend via H
    );
 <DOCUMENT filename="README.md">
 #### Backend Setup:
-- **Save the PHP backend code as api.php.**
-- **Update the database connection details in api.php (e.g., host, database name, username, password).**
-- **Replace the RECAPTCHA_SECRET constant in api.php with your reCAPTCHA secret key.**
-- **Ensure the Uploads/ directory is writable by the web server for file uploads.**
-- **Upload api.php to your web server.**
+- Save the PHP backend code as api.php.
+- Update the database connection details in api.php (e.g., host, database name, username, password).
+- Replace the RECAPTCHA_SECRET constant in api.php with your reCAPTCHA secret key.
+- Ensure the Uploads/ directory is writable by the web server for file uploads.
+- Upload api.php to your web server.
 
 #### Frontend Setup:
-- **Save the frontend code as index.html.**
-- **Update the BASE_URL constant in index.html to match your server's domain (e.g., https://yourdomain.com).**
-- **Replace the reCAPTCHA site key in index.html (6LejTjYrAAAAAILxCq5QrZZ_fBN5hPfbo_zxRR09) with your reCAPTCHA site key.**
-- **Upload index.html to your web server or host it separately.**
+- Save the frontend code as index.html
+- Update the BASE_URL constant in index.html to match your server's domain (e.g., https://yourdomain.com).
+- Replace the reCAPTCHA site key in index.html (6LejTjYrAAAAAILxCq5QrZZ_fBN5hPfbo_zxRR09) with your reCAPTCHA site key.
+- Upload index.html to your web server or host it separately.
 
 #### Running the Application:
-- **Ensure your web server is running with PHP and MySQL configured.**
-- **Access index.html through a browser (e.g., https://yourdomain.com/index.html).**
-- **Register a new user or log in with an existing account.**
-- **Start chatting and sharing files securely.**
+- Ensure your web server is running with PHP and MySQL configured.
+- Access index.html through a browser (e.g., https://yourdomain.com/index.html).
+- Register a new user or log in with an existing account.
+- Start chatting and sharing files securely.
 
 #### Using the Live Site:
 The application is hosted live at [FriendChat](https://friendchat.infinityfreeapp.com). To use it:
-- **Visit [https://friendchat.infinityfreeapp.com](https://friendchat.infinityfreeapp.com) in your browser.**
-- **Register a new account by providing a username (minimum 3 alphanumeric characters) and password (minimum 6 characters), and complete the reCAPTCHA.**
-- **Log in with your credentials and complete the reCAPTCHA.**
-- **Start chatting by typing messages, adding emojis, or uploading files (JPEG, PNG, GIF, PDF; max 10MB).**
-- **Download shared files by clicking the "Download" link next to file messages.**
-- **Log out when finished using the "Logout" button.**
+- Visit [https://friendchat.infinityfreeapp.com](https://friendchat.infinityfreeapp.com) in your browser.
+- Register a new account by providing a username (minimum 3 alphanumeric characters) and password (minimum 6 characters), and complete the reCAPTCHA.
+- Log in with your credentials and complete the reCAPTCHA.
+- Start chatting by typing messages, adding emojis, or uploading files (JPEG, PNG, GIF, PDF; max 10MB).
+- Download shared files by clicking the "Download" link next to file messages.
+- Log out when finished using the "Logout" button.
 

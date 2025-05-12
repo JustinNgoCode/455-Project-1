@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureChat</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        #auth, #chat {
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #ffffff;
+            border: 2px solid #ecf0f1;
+            word-wrap: break-word;
+            color: #000000;
+        }
+        .message.sent {
+            border-color: #3498db;
+            text-align: right;
+        }
+        .message.received {
+            border-color: #e74c3c;
+        }
+        .username {
+            font-weight: bold;
+        }
+        input, button {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover:not(:disabled) {
+            background-color: #27ae60;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #auth-error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        a {
+            color: #1e90ff;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 5px;
+            padding: 2px 8px;
+            background-color: #ffffff;
+            border: 1px solid #1e90ff;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #104e8b;
+            background-color: #e6f0fa;
+        }
+        .emoji-selector-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        #emoji-btn {
+            width: 40px;
+            padding: 5px;
+            background-color: #f1c40f;
+            color: #000000;
+            font-size: 1.2em;
+            border-radius: 5px;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+        #emoji-btn:hover:not(:disabled) {
+            background-color: #e1b60e;
+        }
+        #emoji-selector {
+            display: none;
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 200px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .emoji {
+            font-size: 1.5em;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        .emoji:hover {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        #recaptcha-register, #recaptcha-login {
+            margin: 8px 0;
+        }
+    </style>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+</head>
+<body>
+    <div id="auth">
+        <h2>SecureChat</h2>
+        <div class="section">
+            <h3>Register</h3>
+            <input type="text" id="reg-username" placeholder="Username (min 3 chars)">
+            <input type="password" id="reg-password" placeholder="Password (min 6 chars)">
+            <div id="recaptcha-register" class="g-recaptcha"></div>
+            <button id="register-btn">Register</button>
+        </div>
+        <div class="section">
+            <h3>Login</h3>
+            <input type="text" id="login-username" placeholder="Username">
+            <input type="password" id="login-password" placeholder="Password">
+            <div id="recaptcha-login" class="g-recaptcha"></div>
+            <button id="login-btn">Login</button>
+        </div>
+        <p id="auth-error"></p>
+    </div>
+
+    <div id="chat" style="display: none;">
+        <h2>Chat</h2>
+        <div id="messages"></div>
+        <input type="text" id="message-input" placeholder="Type a message...">
+        <div class="emoji-selector-container">
+            <button id="emoji-btn">😊</button>
+            <div id="emoji-selector">
+                <span class="emoji" data-emoji="😊">😊</span>
+                <span class="emoji" data-emoji="😂">😂</span>
+                <span class="emoji" data-emoji="❤️">❤️</span>
+                <span class="emoji" data-emoji="👍">👍</span>
+                <span class="emoji" data-emoji="😢">😢</span>
+                <span class="emoji" data-emoji="😡">😡</span>
+                <span class="emoji" data-emoji="🎉">🎉</span>
+                <span class="emoji" data-emoji="🚀">🚀</span>
+                <span class="emoji" data-emoji="🌟">🌟</span>
+                <span class="emoji" data-emoji="💡">💡</span>
+            </div>
+        </div>
+        <input type="file" id="file-input" accept="image/*,application/pdf">
+        <button id="send-btn">Send</button>
+        <button id="logout-btn">Logout</button>
+    </div>
+
+    <script>
+        let currentUsername = "";
+        const BASE_URL = "https://friendchat.infinityfreeapp.com/";
+        let requestCount = 0;
+        const MAX_REQUESTS = 10;
+        const REQUEST_WINDOW = 60000;
+        let recaptchaRegisterWidgetId = null;
+        let recaptchaLoginWidgetId = null;
+
+        // Callback for reCAPTCHA loading
+        function onRecaptchaLoad() {
+            // Render reCAPTCHA for register
+            recaptchaRegisterWidgetId = grecaptcha.render('recaptcha-register', {
+                'sitekey': '6LejTjYrAAAAAILxCq5QrZZ_fBN5hPfbo_zxRR09',
+                'theme': 'light'
+            });
+
+            // Render reCAPTCHA for login
+            recaptchaLoginWidgetId = grecaptcha.render('recaptcha-login', {
+                'sitekey': '6LejTjYrAAAAAILxCq5QrZZ_fBN5hPfbo_zxRR09',
+                'theme': 'light'
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("JavaScript loaded and DOM ready");
+
+            // Register button
+            const registerBtn = document.getElementById("register-btn");
+            if (registerBtn) {
+                registerBtn.addEventListener("click", async () => {
+                    if (!checkClientRateLimit()) return;
+                    console.log("Register button clicked");
+                    registerBtn.disabled = true;
+                    registerBtn.textContent = "Registering...";
+                    const username = document.getElementById("reg-username").value.trim();
+                    const password = document.getElementById("reg-password").value.trim();
+                    const recaptcha = recaptchaRegisterWidgetId !== null ? grecaptcha.getResponse(recaptchaRegisterWidgetId) : '';
+                    const errorElement = document.getElementById("auth-error");
+
+                    if (!username || !password || username.length < 3 || password.length < 6 || !recaptcha) {
+                        errorElement.textContent = "All fields and reCAPTCHA are required";
+                        registerBtn.disabled = false;
+                        registerBtn.textContent = "Register";
+                        if (recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+                        return;
+                    }
+
+                    console.log("Sending register request:", { username });
+                    try {
+                        const response = await fetch("api.php", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ action: "register", username, password, recaptcha })
+                        });
+                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                        const result = await response.json();
+                        errorElement.textContent = result.success ? "Registration successful! Please log in." : result.message || "Registration failed";
+                        if (result.success) {
+                            document.getElementById("reg-username").value = "";
+                            document.getElementById("reg-password").value = "";
+                        }
+                    } catch (e) {
+                        console.error("Register error:", e);
+                        errorElement.textContent = "Error: " + e.message;
+                    } finally {
+                        registerBtn.disabled = false;
+                        registerBtn.textContent = "Register";
+                        if (recaptchaRegisterWidgetId !== null) grecaptcha.reset(recaptchaRegisterWidgetId);
+                    }
+                });
+            }
+
+            // Login button
+            const loginBtn = document.getElementById("login-btn");
+            if (loginBtn) {
+                loginBtn.addEventListener("click", async () => {
+                    if (!checkClientRateLimit()) return;
+                    console.log("Login button clicked");
+                    loginBtn.disabled = true;
+                    loginBtn.textContent = "Logging in...";
+                    const username = document.getElementById("login-username").value.trim();
+                    const password = document.getElementById("login-password").value.trim();
+                    const recaptcha = recaptchaLoginWidgetId !== null ? grecaptcha.getResponse(recaptchaLoginWidgetId) : '';
+                    const errorElement = document.getElementById("auth-error");
+
+                    if (!username || !password || !recaptcha) {
+                        errorElement.textContent = "All fields and reCAPTCHA are required";
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = "Login";
+                        if (recaptchaLoginWidgetId !== null) grecaptcha.reset(recaptchaLoginWidgetId);
+                        return;
+                    }
+
+                    console.log("Sending login request:", { username });
+                    try {
+                        const response = await fetch("api.php", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ action: "login", username, password, recaptcha })
+                        });
+                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                        const result = await response.json();
+                        if (result.success) {
+                            currentUsername = username;
+                            document.getElementById("auth").style.display = "none";
+                            document.getElementById("chat").style.display = "block";
+                            loadMessages();
+                            document.getElementById("login-username").value = "";
+                            document.getElementById("login-password").value = "";
+                        } else {
+                            errorElement.textContent = result.message || "Login failed";
+                        }
+                    } catch (e) {
+                        console.error("Login error:", e);
+                        errorElement.textContent = "Error: " + e.message;
+                    } finally {
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = "Login";
+                        if (recaptchaLoginWidgetId !== null) grecaptcha.reset(recaptchaLoginWidgetId);
+                    }
+                });
+            }
+
+            // Emoji selector functionality
+            const emojiBtn = document.getElementById("emoji-btn");
+            const emojiSelector = document.getElementById("emoji-selector");
+            const messageInput = document.getElementById("message-input");
+            if (emojiBtn && emojiSelector) {
+                emojiBtn.addEventListener("click", () => {
+                    emojiSelector.style.display = emojiSelector.style.display === "none" ? "block" : "none";
+                });
+                emojiSelector.addEventListener("click", (e) => {
+                    if (e.target.classList.contains("emoji")) {
+                        messageInput.value += e.target.dataset.emoji;
+                        emojiSelector.style.display = "none";
+                    }
+                });
+            }
+
+            // Send message button
+            const sendBtn = document.getElementById("send-btn");
+            if (sendBtn) {
+                sendBtn.addEventListener("click", async () => {
+                    if (!checkClientRateLimit()) return;
+                    console.log("Send button clicked");
+                    sendBtn.disabled = true;
+                    sendBtn.textContent = "Sending...";
+                    if (!currentUsername) {
+                        appendMessage("Error: Please log in first.", null, true);
+                        sendBtn.disabled = false;
+                        sendBtn.textContent = "Send";
+                        return;
+                    }
+
+                    const messageInput = document.getElementById("message-input");
+                    const fileInput = document.getElementById("file-input");
+                    const message = messageInput.value.trim();
+                    const file = fileInput.files[0];
+
+                    if (!message && !file) {
+                        sendBtn.disabled = false;
+                        sendBtn.textContent = "Send";
+                        return;
+                    }
+
+                    if (file) {
+                        const formData = new FormData();
+                        formData.append("action", "uploadFile");
+                        formData.append("sender", currentUsername);
+                        formData.append("file", file);
+
+                        console.log("Uploading file:", { sender: currentUsername, file: file.name });
+                        try {
+                            const response = await fetch("api.php", {
+                                method: "POST",
+                                body: formData
+                            });
+                            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                            const result = await response.json();
+                            if (result.success) {
+                                fileInput.value = "";
+                                loadMessages();
+                                fetch("api.php", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ action: "logEvent", event: `File uploaded by ${currentUsername}` })
+                                });
+                            } else {
+                                appendMessage("Error: " + result.message, null, true);
+                            }
+                        } catch (e) {
+                            console.error("File upload error:", e);
+                            appendMessage("Error: " + e.message, null, true);
+                        } finally {
+                            sendBtn.disabled = false;
+                            sendBtn.textContent = "Send";
+                        }
+                    } else if (message) {
+                        console.log("Sending message:", { sender: currentUsername, content: message });
+                        try {
+                            const response = await fetch("api.php", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ action: "sendMessage", sender: currentUsername, content: message })
+                            });
+                            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                            const result = await response.json();
+                            if (result.success) {
+                                messageInput.value = "";
+                                loadMessages();
+                                fetch("api.php", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ action: "logEvent", event: `Message sent by ${currentUsername}` })
+                                });
+                            } else {
+                                appendMessage("Error: " + result.message, null, true);
+                            }
+                        } catch (e) {
+                            console.error("Send message error:", e);
+                            appendMessage("Error: " + e.message, null, true);
+                        } finally {
+                            sendBtn.disabled = false;
+                            sendBtn.textContent = "Send";
+                        }
+                    }
+                });
+            }
+
+            // Logout button
+            const logoutBtn = document.getElementById("logout-btn");
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", () => {
+                    currentUsername = "";
+                    document.getElementById("chat").style.display = "none";
+                    document.getElementById("auth").style.display = "block";
+                    document.getElementById("messages").innerHTML = "";
+                });
+            }
+
+            function checkClientRateLimit() {
+                const now = Date.now();
+                if (requestCount >= MAX_REQUESTS) {
+                    const timeSinceFirst = now - window.requestStartTime;
+                    if (timeSinceFirst < REQUEST_WINDOW) {
+                        console.log("Client rate limit exceeded");
+                        return false;
+                    }
+                    requestCount = 0;
+                    window.requestStartTime = now;
+                }
+                if (requestCount === 0) window.requestStartTime = now;
+                requestCount++;
+                return true;
+            }
+
+            function appendMessage(message, timestamp = null, isError = false, isFile = false, filePath = null) {
+                const messagesDiv = document.getElementById("messages");
+                const messageElement = document.createElement("div");
+                messageElement.className = "message";
+                if (currentUsername && message.startsWith(currentUsername + ":")) {
+                    messageElement.className += " sent";
+                } else if (!isError) {
+                    messageElement.className += " received";
+                }
+
+                const [username, content] = message.split(": ");
+                const formattedMessage = `<span class="username">${username}:</span> ${content || ''}`;
+
+                if (isFile) {
+                    console.log("Rendering file message:", { message, filePath });
+                    const fileName = content;
+                    const absoluteFilePath = filePath ? BASE_URL + filePath : "#";
+                    messageElement.innerHTML = `${formattedMessage} <a href="${absoluteFilePath}" target="_blank" download>Download</a> <span style="font-size: 0.7em; color: #000000;">${timestamp ? new Date(timestamp).toLocaleString() : ''}</span>`;
+                } else {
+                    messageElement.innerHTML = `${formattedMessage} <span style="font-size: 0.7em; color: #000000;">${timestamp ? new Date(timestamp).toLocaleString() : ''}</span>`;
+                }
+
+                messagesDiv.appendChild(messageElement);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
+            async function loadMessages() {
+                if (!currentUsername) return;
+                if (!checkClientRateLimit()) return;
+
+                console.log("Loading messages for user:", currentUsername);
+                try {
+                    const response = await fetch("api.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "getMessages" })
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    const result = await response.json();
+                    if (result.success) {
+                        const messagesDiv = document.getElementById("messages");
+                        messagesDiv.innerHTML = "";
+                        result.messages.forEach(msg => {
+                            if (msg.type === "file") {
+                                appendMessage(`${msg.sender}: ${msg.content}`, msg.timestamp, false, true, msg.file_path);
+                            } else {
+                                appendMessage(`${msg.sender}: ${msg.content}`, msg.timestamp);
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error loading messages:", e);
+                    appendMessage("Error loading messages: " + e.message, null, true);
+                }
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93e74a621ccf4533',t:'MTc0NzAyNTM3Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

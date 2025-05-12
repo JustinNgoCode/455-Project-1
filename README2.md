@@ -1,4 +1,3 @@
-<DOCUMENT filename="README.md">
 ## FriendChat
 
 FriendChat is a secure chat application built with PHP and MySQL for the backend, and a single-page HTML/JavaScript frontend. It features user authentication, real-time messaging, file sharing, end-to-end encryption, rate limiting, and reCAPTCHA for spam protection. The application is designed for secure communication over the internet using HTTPS.

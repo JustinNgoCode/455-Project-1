@@ -87,3 +87,51 @@ A single-page HTML/JavaScript interface that communicates with the backend via H
        event TEXT NOT NULL,
        timestamp DATETIME NOT NULL
    );
+<DOCUMENT filename="README.md">
+#### Backend Setup:
+- **Save the PHP backend code as `api.php`.**
+- **Update the database connection details in `api.php` (e.g., host, database name, username, password).**
+- **Replace the `RECAPTCHA_SECRET` constant in `api.php` with your reCAPTCHA secret key.**
+- **Ensure the `Uploads/` directory is writable by the web server for file uploads.**
+- **Upload `api.php` to your web server.**
+
+#### Frontend Setup:
+- **Save the frontend code as `index.html`.**
+- **Update the `BASE_URL` constant in `index.html` to match your server's domain (e.g., `https://yourdomain.com/`).**
+- **Replace the reCAPTCHA site key in `index.html` (`6LejTjYrAAAAAILxCq5QrZZ_fBN5hPfbo_zxRR09`) with your reCAPTCHA site key.**
+- **Upload `index.html` to your web server or host it separately.**
+
+#### Running the Application:
+- **Ensure your web server is running with PHP and MySQL configured.**
+- **Access `index.html` through a browser (e.g., `https://yourdomain.com/index.html`).**
+- **Register a new user or log in with an existing account.**
+- **Start chatting and sharing files securely.**
+
+#### Using the Live Site:
+The application is hosted live at [FriendChat](https://friendchat.infinityfreeapp.com). To use it:
+- **Visit [https://friendchat.infinityfreeapp.com](https://friendchat.infinityfreeapp.com) in your browser.**
+- **Register a new account by providing a username (minimum 3 alphanumeric characters) and password (minimum 6 characters), and complete the reCAPTCHA.**
+- **Log in with your credentials and complete the reCAPTCHA.**
+- **Start chatting by typing messages, adding emojis, or uploading files (JPEG, PNG, GIF, PDF; max 10MB).**
+- **Download shared files by clicking the "Download" link next to file messages.**
+- **Log out when finished using the "Logout" button.**
+
+## Security Notes:
+- **Messages are encrypted with AES-256-CBC using a predefined key (`ENCRYPTION_KEY` in `api.php`).**
+- **Passwords are hashed using PHP's `password_hash` function.**
+- **File uploads are validated for type and size (max 10MB).**
+- **Rate limiting is enforced both server-side (per IP) and client-side (per session).**
+- **reCAPTCHA v2 is used to prevent automated spam.**
+
+## Limitations:
+- **No WebSocket support; messages are polled via HTTP requests.**
+- **No real-time user presence (e.g., online/offline status).**
+- **File encryption is not implemented for uploads; files are stored as-is on the server.**
+- **No support for Markdown text formatting in messages.**
+
+## Future Improvements:
+- **Add WebSocket support for real-time messaging.**
+- **Implement file encryption for uploads.**
+- **Add user presence indicators (online/offline status).**
+- **Support Markdown-like text formatting (bold, italic, links).**
+- **Add reconnection logic for network interruptions.**

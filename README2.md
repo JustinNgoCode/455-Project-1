@@ -22,7 +22,7 @@ FriendChat is a secure chat application built with PHP and MySQL for the backend
 Built with PHP and MySQL, the backend handles user authentication, message storage, file uploads, and rate limiting.
 
 ##### Main Features:
-- User registration and login with hashed passwords (using PHP's `password_hash`).
+- User registration and login with hashed passwords (using PHP's password_hash).
 - AES-256-CBC encryption for message content.
 - File upload handling with validation (size, type, and directory creation).
 - Rate limiting (10 requests per minute per IP).
@@ -49,15 +49,15 @@ A single-page HTML/JavaScript interface that communicates with the backend via H
 1. A web server with PHP (version 7.4 or higher) and MySQL support (e.g., InfinityFree hosting).
 2. A reCAPTCHA v2 key pair from [Google reCAPTCHA](https://www.google.com/recaptcha).
 3. A MySQL database with the following tables:
-   - `users` (for storing user credentials)
-   - `messages` (for storing chat messages and files)
-   - `requests` (for rate limiting)
-   - `logs` (for event logging)
+   - users (for storing user credentials)
+   - messages (for storing chat messages and files)
+   - requests (for rate limiting)
+   - logs (for event logging)
 
 #### Database Setup:
-1. Create a MySQL database (e.g., `friendchat`).
+1. Create a MySQL database (e.g., friendchat).
 2. Create the required tables using the following SQL schema:
-   ```sql
+   sql
    CREATE TABLE users (
        id INT AUTO_INCREMENT PRIMARY KEY,
        username VARCHAR(255) NOT NULL UNIQUE,
@@ -89,21 +89,21 @@ A single-page HTML/JavaScript interface that communicates with the backend via H
    );
 <DOCUMENT filename="README.md">
 #### Backend Setup:
-- **Save the PHP backend code as `api.php`.**
-- **Update the database connection details in `api.php` (e.g., host, database name, username, password).**
-- **Replace the `RECAPTCHA_SECRET` constant in `api.php` with your reCAPTCHA secret key.**
-- **Ensure the `Uploads/` directory is writable by the web server for file uploads.**
-- **Upload `api.php` to your web server.**
+- **Save the PHP backend code as api.php.**
+- **Update the database connection details in api.php (e.g., host, database name, username, password).**
+- **Replace the RECAPTCHA_SECRET constant in api.php with your reCAPTCHA secret key.**
+- **Ensure the Uploads/ directory is writable by the web server for file uploads.**
+- **Upload api.php to your web server.**
 
 #### Frontend Setup:
-- **Save the frontend code as `index.html`.**
-- **Update the `BASE_URL` constant in `index.html` to match your server's domain (e.g., `https://yourdomain.com/`).**
-- **Replace the reCAPTCHA site key in `index.html` (`6LejTjYrAAAAAILxCq5QrZZ_fBN5hPfbo_zxRR09`) with your reCAPTCHA site key.**
-- **Upload `index.html` to your web server or host it separately.**
+- **Save the frontend code as index.html.**
+- **Update the BASE_URL constant in index.html to match your server's domain (e.g., https://yourdomain.com).**
+- **Replace the reCAPTCHA site key in index.html (6LejTjYrAAAAAILxCq5QrZZ_fBN5hPfbo_zxRR09) with your reCAPTCHA site key.**
+- **Upload index.html to your web server or host it separately.**
 
 #### Running the Application:
 - **Ensure your web server is running with PHP and MySQL configured.**
-- **Access `index.html` through a browser (e.g., `https://yourdomain.com/index.html`).**
+- **Access index.html through a browser (e.g., https://yourdomain.com/index.html).**
 - **Register a new user or log in with an existing account.**
 - **Start chatting and sharing files securely.**
 

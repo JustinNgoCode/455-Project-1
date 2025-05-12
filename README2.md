@@ -87,7 +87,6 @@ A single-page HTML/JavaScript interface that communicates with the backend via H
        event TEXT NOT NULL,
        timestamp DATETIME NOT NULL
    );
-<DOCUMENT filename="README.md">
 #### Backend Setup:
 - Save the PHP backend code as api.php.
 - Update the database connection details in api.php (e.g., host, database name, username, password).

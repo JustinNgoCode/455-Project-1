@@ -16,6 +16,7 @@ FriendChat is a secure chat application built with PHP and MySQL for the backend
 - **Cross-Origin Support** - Supports CORS for flexible frontend hosting.
 - **Encrypted Chat Logging System** - Logs encrypted chat sessions to the `logs/` directory for debugging.
 - **Local Echo of Messages** - Sender’s messages are shown locally in the chat window.
+- **Text Formatting Support** - Supports bold (`**text**`), italic (`*text*`), and links (`[text](url)`).
 
 ### Project Structure:
 

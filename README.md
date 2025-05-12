@@ -1,6 +1,6 @@
-## SecureChat
+## FriendChat
 
-SecureChat is a real-time chat application built with WebSocket for instant communication, Express for server-side logic, and Electron for a desktop client. It features end-to-end encryption, user registration, private chats, file sharing, and a user-friendly interface. The application now supports communication over a local network (LAN) and is prepared for future Internet deployment with secure protocols (`wss://` and `https://`).
+FriendChat is a real-time chat application built with WebSocket for instant communication, Express for server-side logic, and Electron for a desktop client. It features end-to-end encryption, user registration, private chats, file sharing, and a user-friendly interface. The application now supports communication over a local network (LAN) and is prepared for future Internet deployment with secure protocols (`wss://` and `https://`).
 
 ### Features:
 
